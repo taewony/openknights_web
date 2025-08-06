@@ -1,0 +1,62 @@
+There are still styling issues with the navigation menu:
+1) The vertical alignment of the "Login" menu item is different from "Dashboard" and "Projects". 
+   - Make all menu items (Dashboard, Projects, Login) have the same vertical alignment.
+   - Ensure they share the same base CSS/Tailwind classes for alignment.
+
+2) The hover effect for the "Login" menu item is different from the other menu items.
+   - Unify the hover styles so all menu items have the same hover behavior (text color change, underline, or background highlight).
+   - Apply consistent padding, margin, and border-radius so the active/hover states look identical across all menu items.
+
+Update the React components and Tailwind className values as needed to achieve consistent alignment and hover styling for all menu items.
+
+
+---- 아래는 작업 완성된 prompt이므로 무시한다.
+1. `LoginMenu.tsx` 생성  
+2. `app/page.tsx`에서 LoginMenu 호출 추가  
+3. `main-layout.tsx`에서 중복된 로그인/로그아웃 코드 제거  
+
+Create a new React component called `LoginMenu` in `components/LoginMenu.tsx`.
+This component should:
+1. Use Firebase Auth to check if the user is logged in.
+2. If logged in, show a "Logout" button (calls `signOut` from Firebase).
+3. If not logged in, show a "Login" link (navigates to `/login` page).
+4. Use `useAuthState` from `react-firebase-hooks/auth` if available.
+
+Update:
+- `app/page.tsx`: add `<LoginMenu />` inside the default `Home` page export, replacing any static "Login" menu code.
+- `layouts/main-layout.tsx`: remove any inline login/logout logic and use the new `<LoginMenu />` instead.
+
+Style:
+- Use Tailwind CSS classes to match existing menu button/link styles.
+
+Here is a starter code skeleton for `components/LoginMenu.tsx`:
+
+```tsx
+import React from 'react'
+import Link from 'next/link'
+import { auth } from '../lib/firebase' // adjust path to your firebase config
+import { signOut } from 'firebase/auth'
+import { useAuthState } from 'react-firebase-hooks/auth'
+
+const LoginMenu: React.FC = () => {
+  const [user, loading] = useAuthState(auth)
+
+  if (loading) {
+    return <span className="text-gray-500">Loading...</span>
+  }
+
+  return user ? (
+    <button
+      onClick={() => signOut(auth)}
+      className="px-3 py-1 rounded hover:bg-gray-100"
+    >
+      Logout
+    </button>
+  ) : (
+    <Link href="/login" className="px-3 py-1 rounded hover:bg-gray-100">
+      Login
+    </Link>
+  )
+}
+
+export default LoginMenu

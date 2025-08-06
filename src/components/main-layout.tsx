@@ -12,6 +12,7 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { useEffect, useState } from 'react';
+import LoginMenu from '@/components/LoginMenu';
 
 function KnightsLogo() {
   return (
@@ -81,114 +82,32 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                     side: "right",
                   }}
                 >
-                  <Link href={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`inline-flex items-center px-3 py-2 rounded-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-sm h-10 ${pathname.startsWith(item.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
+                  >
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-            {/* 로그인/로그아웃 상태에 따라 Login/Logout 메뉴 동적 표시 */}
-            {currentUser ? (
-              <SidebarMenuItem key="logout">
-                <SidebarMenuButton
-                  asChild
-                  isActive={false}
-                  tooltip={{ children: "로그아웃", side: "right" }}
-                >
-                  <button
-                    className="flex items-center w-full gap-2 text-left"
-                    onClick={() => {
-                      const auth = getAuth();
-                      auth.signOut();
-                      window.location.href = "/";
-                    }}
-                  >
-                    <LogOut />
-                    <span>로그아웃</span>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ) : (
-              <SidebarMenuItem key="login">
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "/login"}
-                  tooltip={{ children: "로그인", side: "right" }}
-                >
-                  <Link href="/login" className="flex items-center gap-2">
-                    <ShieldCheck />
-                    <span>로그인</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
+            {/* 로그인/로그아웃 메뉴를 LoginMenu로 대체 */}
+            <SidebarMenuItem key="login-menu">
+              <SidebarMenuButton asChild isActive={pathname === '/login'} tooltip={{ children: "로그인/로그아웃", side: "right" }}>
+                <LoginMenu active={pathname === '/login'} />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <Separator className="my-2" />
         <SidebarFooter>
-          {currentUser ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-auto w-full justify-start p-2">
-                  <div className="flex items-center gap-2 w-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="user avatar" />
-                      <AvatarFallback>OK</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                      <span className="text-sm font-medium">
-                        {userRole}: {currentUser.email?.split("@")[0]}
-                      </span>
-                    </div>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 mb-2" side="right" align="start" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {userRole}: {currentUser.email?.split("@")[0]}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {currentUser.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    const auth = getAuth();
-                    auth.signOut();
-                    window.location.href = "/";
-                  }}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>로그아웃</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button
-              variant="ghost"
-              className="h-auto w-full justify-start p-2"
-              onClick={() => (window.location.href = "/login")}
-            >
-              <div className="flex items-center gap-2 w-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="user avatar" />
-                  <AvatarFallback>OK</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                  <span className="text-sm font-medium">로그인</span>
-                </div>
-              </div>
-            </Button>
+          {/* 좌측 하단 사용자 정보 표시 복원 */}
+          {currentUser && (
+            <div className="flex items-center gap-2 p-2 text-xs text-muted-foreground">
+              <span className="font-semibold">{userRole ? userRole : 'User'}:</span>
+              <span>{currentUser.email?.split("@")[0]}</span>
+            </div>
           )}
         </SidebarFooter>
       </Sidebar>
@@ -201,7 +120,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md font-medium hover:bg-accent transition-colors ${pathname.startsWith(item.href) ? 'bg-accent text-primary' : 'text-muted-foreground'}`}
+                  className={`px-3 py-2 rounded-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                    ${pathname.startsWith(item.href)
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
                 >
                   {item.label}
                 </Link>
