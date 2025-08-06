@@ -102,13 +102,47 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         </SidebarContent>
         <Separator className="my-2" />
         <SidebarFooter>
-          {/* 좌측 하단 사용자 정보 표시 복원 */}
-          {currentUser && (
-            <div className="flex items-center gap-2 p-2 text-xs text-muted-foreground">
-              <span className="font-semibold">{userRole ? userRole : 'User'}:</span>
-              <span>{currentUser.email?.split("@")[0]}</span>
-            </div>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-auto w-full justify-start p-2">
+                <div className="flex items-center gap-2 w-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="user avatar" />
+                    <AvatarFallback>OK</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
+                    <span className="text-sm font-medium">
+                      {currentUser ? (userRole && currentUser.email ? `${userRole}: ${currentUser.email.split("@")[0]}` : (userRole || 'User')) : '로그인 필요'}
+                    </span>
+                  </div>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 mb-2" side="right" align="start" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {currentUser ? (userRole && currentUser.email ? `${userRole}: ${currentUser.email.split("@")[0]}` : (userRole || 'User')) : '로그인 필요'}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {currentUser ? currentUser.email : ''}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
