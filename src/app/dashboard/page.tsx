@@ -1,10 +1,22 @@
+"use client";
+
 import { MainLayout } from '@/components/main-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Swords, Briefcase, Calendar, Clock } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { app } from "@/lib/firebase";
 
 export default function DashboardPage() {
+    const [user, setUser] = useState<User | null>(null);
+    useEffect(() => {
+        const auth = getAuth(app);
+        const unsubscribe = onAuthStateChanged(auth, setUser);
+        return () => unsubscribe();
+    }, []);
+
     const contests = [
         { name: "Summer CodeFest '24", startDate: "2024-07-01", endDate: "2024-07-07", status: "Ongoing" },
         { name: "AI Innovation Challenge", startDate: "2024-08-15", endDate: "2024-08-22", status: "Upcoming" },
