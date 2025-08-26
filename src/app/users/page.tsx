@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { app } from "@/lib/firebase";
-import { MainLayout } from '@/components/main-layout';
+import { useAuth } from "@/contexts/AuthContext";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,6 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 
 export default function UsersPage() {
+  const { currentUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   useEffect(() => {
     const fetchUsers = async () => {
@@ -25,7 +27,7 @@ export default function UsersPage() {
   }, []);
   
   return (
-      <MainLayout>
+      
           <Card>
               <CardHeader>
                   <CardTitle className="font-headline">User Management</CardTitle>
@@ -54,6 +56,10 @@ export default function UsersPage() {
                                           <div>
                                               <p className="font-medium">{user.name}</p>
                                               <p className="text-sm text-muted-foreground">{user.email}</p>
+                                              {user.introduction && <p className="text-xs text-muted-foreground mt-1">{user.introduction}</p>}
+                                              {user.roles && user.roles.length > 0 && (
+                                                <p className="text-xs text-muted-foreground mt-1">Roles: {user.roles.join(', ')}</p>
+                                              )}
                                           </div>
                                       </div>
                                   </TableCell>
@@ -73,7 +79,9 @@ export default function UsersPage() {
                                           <DropdownMenuContent align="end">
                                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                               <DropdownMenuItem>View Profile</DropdownMenuItem>
-                                              <DropdownMenuItem>Edit Role</DropdownMenuItem>
+                                              {currentUser && currentUser.email === user.email && (
+                                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                              )}
                                           </DropdownMenuContent>
                                       </DropdownMenu>
                                   </TableCell>
@@ -83,6 +91,6 @@ export default function UsersPage() {
                   </Table>
               </CardContent>
           </Card>
-      </MainLayout>
+      
   );
 }
