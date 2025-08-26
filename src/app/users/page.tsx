@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { app } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import Link from 'next/link';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,16 +12,23 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import EditProfileDialog from '@/components/EditProfileDialog';
 
 
 export default function UsersPage() {
   const { currentUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
+
+  const handleUserUpdate = (updatedUser: any) => {
+    setUsers(users.map(u => u.email === updatedUser.email ? updatedUser : u));
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       const db = getFirestore(app);
       const querySnapshot = await getDocs(collection(db, "users"));
-      const userList = querySnapshot.docs.map(doc => doc.data());
+      const userList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setUsers(userList);
     };
     fetchUsers();
@@ -38,6 +46,7 @@ export default function UsersPage() {
                       <TableHeader>
                           <TableRow>
                               <TableHead>User</TableHead>
+                              <TableHead>소개</TableHead>
                               <TableHead>Role</TableHead>
                               <TableHead className="text-center">Projects</TableHead>
                               <TableHead className="text-center">Contests</TableHead>
@@ -56,17 +65,28 @@ export default function UsersPage() {
                                           <div>
                                               <p className="font-medium">{user.name}</p>
                                               <p className="text-sm text-muted-foreground">{user.email}</p>
-                                              {user.introduction && <p className="text-xs text-muted-foreground mt-1">{user.introduction}</p>}
-                                              {user.roles && user.roles.length > 0 && (
-                                                <p className="text-xs text-muted-foreground mt-1">Roles: {user.roles.join(', ')}</p>
-                                              )}
                                           </div>
                                       </div>
                                   </TableCell>
                                   <TableCell>
-                                      <Badge variant={user.role === 'Admin' ? 'destructive' : user.role === 'Judge' ? 'default' : 'secondary'}>{user.role}</Badge>
+                                      {user.introduction && <p className="text-sm text-muted-foreground">{user.introduction}</p>}
                                   </TableCell>
-                                  <TableCell className="text-center font-medium">{user.projects}</TableCell>
+                                  <TableCell>
+                                      {user.roles && user.roles.length > 0 ? user.roles.join(', ') : user.role}
+                                  </TableCell>
+                                  <TableCell className="text-center font-medium">
+                                      {user.projects && user.projects.length > 0 ? (
+                                          <div className="flex flex-wrap justify-center gap-1">
+                                              {user.projects.map((projectName: string, index: number) => (
+                                                  <Link key={index} href={`/projects/details?name=${encodeURIComponent(projectName)}`} className="text-blue-600 hover:underline">
+                                                      {projectName}
+                                                  </Link>
+                                              ))}
+                                          </div>
+                                      ) : (
+                                          <span>0</span>
+                                      )}
+                                  </TableCell>
                                   <TableCell className="text-center font-medium">{user.contests}</TableCell>
                                   <TableCell>
                                       <DropdownMenu>
@@ -80,7 +100,12 @@ export default function UsersPage() {
                                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                               <DropdownMenuItem>View Profile</DropdownMenuItem>
                                               {currentUser && currentUser.email === user.email && (
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                <Dialog>
+                                                  <DialogTrigger asChild>
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
+                                                  </DialogTrigger>
+                                                  <EditProfileDialog user={user} onUpdate={handleUserUpdate} />
+                                                </Dialog>
                                               )}
                                           </DropdownMenuContent>
                                       </DropdownMenu>

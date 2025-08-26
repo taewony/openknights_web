@@ -21,7 +21,7 @@ export enum Phase {
     AWARDED_EXCELLENCE = "최우수상 수상",
     AWARDED_ENCOURAGEMENT = "우수상 수상",
     DELETED = "삭제",
-    FINISHED = "종료",
+    FINISHED = "FINISHED",
 }
 
 export interface User {
@@ -35,6 +35,16 @@ export interface User {
     projects: string[];            // 참여 중인 '프로젝트 이름' 목록
 }
 
+export interface Document {
+    name: string;
+    url: string;
+}
+
+export interface Screenshot {
+    url: string;
+    alt: string;
+}
+
 export interface Project {
     name: string;                  // 프로젝트 이름 (Unique)
     term: string;                  // 참여 대회(Contest)의 term
@@ -46,6 +56,9 @@ export interface Project {
     description?: string;      // 상세 설명
     mentor?: string;           // 멘토 '사용자 이름'
     note?: string;             // 비고
+    githubUrl?: string;        // GitHub URL
+    documents?: Document[];    // 문서 목록
+    screenshots?: Screenshot[];// 스크린샷 목록
     // ... score fields
 }
 

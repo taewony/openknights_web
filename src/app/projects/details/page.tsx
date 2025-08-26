@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from 'react';
-import { MainLayout } from '@/components/main-layout';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
+import { Project } from '@/types';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Github, Heart, Users, FileText, ImageIcon, ExternalLink } from 'lucide-react';
+import { Github, Heart, Users, FileText, ImageIcon, ExternalLink, Calendar } from 'lucide-react';
 import Image from 'next/image';
 
 function LikeButton() {
     const [liked, setLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(350);
+    const [likeCount, setLikeCount] = useState(0);
 
     const toggleLike = () => {
         setLiked(!liked);
@@ -27,99 +31,113 @@ function LikeButton() {
 }
 
 export default function ProjectDetailsPage() {
-    const teamMembers = [
-        { name: "Dr. Eva Rostova", role: "Project Lead", avatar: "https://placehold.co/100x100.png", aiHint: "woman portrait" },
-        { name: "Kenji Tanaka", role: "Lead Developer", avatar: "https://placehold.co/100x100.png", aiHint: "man portrait" },
-        { name: "Maria Garcia", role: "AI Researcher", avatar: "https://placehold.co/100x100.png", aiHint: "woman professional" },
-    ];
-    
-    const documents = [
-        { name: "Whitepaper.pdf", icon: FileText },
-        { name: "Research_Findings.docx", icon: FileText },
-    ];
+    const searchParams = useSearchParams();
+    const projectName = searchParams.get('name');
+    const [projectData, setProjectData] = useState<Project | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const screenshots = [
-        { src: "https://placehold.co/600x400.png", alt: "App Screenshot 1", aiHint: "dashboard analytics" },
-        { src: "https://placehold.co/600x400.png", alt: "App Screenshot 2", aiHint: "user interface" },
-    ];
+    useEffect(() => {
+        const fetchProjectData = async () => {
+            if (!projectName) {
+                setError("No project name provided.");
+                setLoading(false);
+                return;
+            }
+            try {
+                const db = getFirestore(app);
+                const projectsRef = collection(db, "projects");
+                const q = query(projectsRef, where("name", "==", projectName));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    setProjectData(querySnapshot.docs[0].data() as Project);
+                } else {
+                    setError("No project data found for this name.");
+                }
+            } catch (err) {
+                console.error("Error fetching project data:", err);
+                setError("Failed to fetch project data.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProjectData();
+    }, [projectName]);
+
+    if (loading) {
+        return (
+            <div className="text-center py-12">
+                <p>Loading project data...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-12 text-red-500">
+                <p>{error}</p>
+            </div>
+        );
+    }
+
+    if (!projectData) {
+        return (
+            <div className="text-center py-12">
+                <p>Project data not available.</p>
+            </div>
+        );
+    }
 
     return (
-        <MainLayout>
-            <div className="grid md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <Badge>AI / Research</Badge>
-                                    <CardTitle className="font-headline text-4xl mt-2">QuantumLeap AI</CardTitle>
-                                    <CardDescription className="mt-2 text-lg">Next-gen machine learning framework designed for academic and industrial research.</CardDescription>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                   <LikeButton />
-                                    <Button variant="outline" asChild>
-                                        <a href="#" target="_blank" rel="noopener noreferrer">
-                                            <Github className="mr-2 h-4 w-4" /> GitHub
-                                        </a>
-                                    </Button>
-                                </div>
+        <div className="flex justify-center py-12">
+            <Card className="w-full max-w-2xl">
+                <CardHeader>
+                    <div className="flex justify-between items-start w-full">
+                        <div>
+                            <CardTitle>{projectData.name}</CardTitle>
+                            <CardDescription>{projectData.description}</CardDescription>
+                        </div>
+                        <LikeButton />
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>Team Name:</strong> {projectData.teamName}</p>
+                    <p><strong>Phase:</strong> {projectData.phase}</p>
+                    <p><strong>Term:</strong> {projectData.term}</p>
+                    <p><strong>Leader:</strong> {projectData.leaderName}</p>
+                    <p><strong>Members:</strong> {projectData.members?.join(', ')}</p>
+                    {projectData.githubUrl && <p><strong>GitHub:</strong> <a href={projectData.githubUrl} target="_blank" rel="noopener noreferrer">{projectData.githubUrl}</a></p>}
+                    {projectData.mentor && <p><strong>Mentor:</strong> {projectData.mentor}</p>}
+                    {projectData.note && <p><strong>Note:</strong> {projectData.note}</p>}
+                    {projectData.language && <p><strong>Language:</strong> {projectData.language}</p>}
+                    
+                    {/* Documents */}
+                    {projectData.documents && projectData.documents.length > 0 && (
+                        <div>
+                            <h3>Documents:</h3>
+                            <ul>
+                                {projectData.documents.map((doc, index) => (
+                                    <li key={index}><a href={doc.url} target="_blank" rel="noopener noreferrer">{doc.name}</a></li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Screenshots */}
+                    {projectData.screenshots && projectData.screenshots.length > 0 && (
+                        <div>
+                            <h3>Screenshots:</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                {projectData.screenshots.map((ss, index) => (
+                                    <Image key={index} src={ss.url} alt={ss.alt} width={300} height={200} />
+                                ))}
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">QuantumLeap AI provides a flexible and powerful platform for developing, training, and deploying advanced machine learning models. It supports distributed training, automatic differentiation, and a rich library of pre-built layers and models. Our goal is to accelerate the pace of AI research by providing tools that are both easy to use and highly performant.</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline flex items-center gap-2"><ImageIcon className="h-5 w-5" /> Screenshots</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {screenshots.map((ss, index) => (
-                                <Image key={index} src={ss.src} alt={ss.alt} data-ai-hint={ss.aiHint} width={600} height={400} className="rounded-lg object-cover" />
-                            ))}
-                        </CardContent>
-                    </Card>
-                </div>
-                <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline flex items-center gap-2"><Users className="h-5 w-5" /> Team Members</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            {teamMembers.map(member => (
-                                <div key={member.name} className="flex items-center gap-4">
-                                    <Avatar>
-                                        <AvatarImage src={member.avatar} data-ai-hint={member.aiHint} />
-                                        <AvatarFallback>{member.name.split(' ').map(n=>n[0]).join('')}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-semibold">{member.name}</p>
-                                        <p className="text-sm text-muted-foreground">{member.role}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline flex items-center gap-2"><FileText className="h-5 w-5" /> Documents</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                             {documents.map((doc) => (
-                                <Button key={doc.name} variant="outline" className="w-full justify-start" asChild>
-                                    <a href="#">
-                                      <doc.icon className="mr-2 h-4 w-4" />
-                                      {doc.name}
-                                      <ExternalLink className="ml-auto h-4 w-4 text-muted-foreground" />
-                                    </a>
-                                </Button>
-                            ))}
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-        </MainLayout>
-    )
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
 }
