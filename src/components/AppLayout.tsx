@@ -1,0 +1,76 @@
+
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { MadeWithDyad } from "@/components/made-with-dyad";
+import { useAuth } from "@/contexts/AuthContext";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
+
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { currentUser } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: "Logged out successfully." });
+      router.push("/");
+    } catch (error) {
+      toast({ title: "Failed to log out.", variant: "destructive" });
+      console.error("Logout failed:", error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-primary text-primary-foreground p-4 shadow-md">
+        <nav className="container mx-auto flex justify-between items-center">
+          <Link href="/" className="text-2xl font-bold">
+            OpenKnights
+          </Link>
+          <div className="space-x-4 flex items-center">
+            <Link href="/contests">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">Contests</Button>
+            </Link>
+            <Link href="/projects">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">Projects</Button>
+            </Link>
+            <Link href="/users">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">Users</Button>
+            </Link>
+            {currentUser ? (
+              <>
+                <Link href="/mypage">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">My Page</Button>
+                </Link>
+                <Button variant="secondary" onClick={handleLogout}>Logout</Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10">Login</Button>
+                </Link>
+                <Link href="/registration">
+                  <Button variant="secondary">Register</Button>
+                </Link>
+              </>
+            )}
+          </div>
+        </nav>
+      </header>
+      <main className="flex-grow container mx-auto p-4">
+        {children}
+      </main>
+      <footer className="p-4 text-center bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+        <MadeWithDyad />
+      </footer>
+    </div>
+  );
+};
+
+export default Layout;

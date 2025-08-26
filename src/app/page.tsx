@@ -1,188 +1,137 @@
 'use client';
 
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Briefcase, Trophy, Users, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
-import { MainLayout } from '@/components/main-layout';
-import LoginMenu from '@/components/LoginMenu';
-import { usePathname } from 'next/navigation';
 
-function KnightsLogo() {
-  return (
-    <ShieldCheck className="h-8 w-8 text-primary" />
-  );
-}
+
+
+import { useState } from 'react'; // Added useState
+import { useAuth } from '@/contexts/AuthContext';
+import CreateProjectDialog from '@/components/CreateProjectDialog';
+
+
+
+
+import { useToast } from '@/hooks/use-toast'; // For toast notifications
 
 export default function Home() {
-  const pathname = usePathname();
+  const { currentUser } = useAuth();
+  const [isCreateProjectDialogOpen, setIsCreateProjectDialogOpen] = useState(false);
+  const { toast } = useToast();
 
+  const handleRegisterProjectClick = () => {
+    if (currentUser) {
+      setIsCreateProjectDialogOpen(true);
+    } else {
+      // Use next/link for navigation
+      // For now, just show a toast if not logged in, or redirect to login page
+      toast({ title: "로그인 후 프로젝트를 등록할 수 있습니다." });
+      // Optionally, redirect to login page:
+      // router.push('/login'); // If using useRouter
+    }
+  };
+
+  const handleProjectCreated = () => {
+    toast({ title: "프로젝트가 성공적으로 등록되었습니다!" });
+    // Optionally navigate to projects page or show a success message
+    // router.push('/projects'); // If using useRouter
+  };
+
+  // Data from the source LandingPage.tsx
   const contests = [
-    { name: "Summer CodeFest '24", description: "A week-long coding marathon." },
-    { name: "AI Innovation Challenge", description: "Build the next generation of AI." },
-    { name: "Open Source Collab", description: "Contribute to impactful OS projects." },
+    { name: "Annual Innovation Challenge", description: "Explore ongoing and upcoming contests." },
+    { name: "Summer Code Jam", description: "Explore ongoing and upcoming contests." },
+    { name: "Design Sprint 2024", description: "Explore ongoing and upcoming contests." },
   ];
 
   const projects = [
-    { name: "Project Phoenix", description: "A decentralized social network." },
-    { name: "QuantumLeap AI", description: "Next-gen machine learning framework." },
-    { name: "EcoTrack", description: "An app for monitoring carbon footprints." },
+    { name: "AI-Powered Chatbot", description: "Browse amazing projects from our community." },
+    { name: "Eco-Friendly Smart Home", description: "Browse amazing projects from our community." },
+    { name: "Interactive Data Visualization", description: "Browse amazing projects from our community." },
   ];
 
   const users = [
-    { name: "Alice", avatar: "https://placehold.co/100x100.png", aiHint: "woman portrait" },
-    { name: "Bob", avatar: "https://placehold.co/100x100.png", aiHint: "man portrait" },
-    { name: "Charlie", avatar: "https://placehold.co/100x100.png", aiHint: "man smiling" },
-    { name: "Diana", avatar: "https://placehold.co/100x100.png", aiHint: "woman professional" },
+    { name: "Alice Johnson", avatar: "https://placehold.co/100x100.png", aiHint: "woman portrait" },
+    { name: "Bob Smith", avatar: "https://placehold.co/100x100.png", aiHint: "man portrait" },
+    { name: "Team Innovate", avatar: "https://placehold.co/100x100.png", aiHint: "group photo" },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
-        <Link href="/" className="flex items-center justify-center gap-2" prefetch={false}>
-          <KnightsLogo />
-          <span className="text-xl font-headline font-semibold">OpenKnights</span>
-        </Link>
-        <nav className="ml-auto flex gap-2 sm:gap-2 items-center h-10">
-          <Link
-            href="/dashboard"
-            className={`inline-flex items-center px-3 py-2 rounded-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-sm h-10 ${pathname.startsWith('/dashboard') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/projects"
-            className={`inline-flex items-center px-3 py-2 rounded-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-sm h-10 ${pathname.startsWith('/projects') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
-          >
-            Projects
-          </Link>
-          <LoginMenu active={pathname === '/login'} />
-        </nav>
-      </header>
+    <>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-card">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                    우송대 오픈소스 경진대회
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    OpenKnights is the ultimate platform for discovering, joining, and managing contests and collaborative projects.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg">
-                    <Link href="/login">
-                        Request a Contest Registration
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-              <Image
-                src="/image/image3.jpg"
-                alt="우송대 오픈소스 경진대회 이미지"
-                width={600}
-                height={400}
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-                priority
-                style={{ width: "auto", height: "auto" }}
-              />
-            </div>
-          </div>
-        </section>
-        
-        <section id="contests" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Contests</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Join the Fray</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Browse through our list of active and upcoming contests. There's a challenge for everyone.
-                </p>
-              </div>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {contests.map((contest, index) => (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center gap-4">
-                    <Trophy className="w-8 h-8 text-primary" />
-                    <CardTitle className="font-headline">{contest.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{contest.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+        {/* Content from D:\code\NextJS\OpenKnights_nextjs\src\pages\LandingPage.tsx */}
+        <section className="text-center py-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-lg">
+          <h1 className="text-5xl font-extrabold mb-4">우송대학교 경진대회 플랫폼!</h1>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Discover exciting contests, showcase innovative projects, and connect with talented users.
+          </p>
+          <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" onClick={handleRegisterProjectClick}>
+            내 프로젝트 등록
+          </Button>
         </section>
 
-        <section id="projects" className="w-full py-12 md:py-24 lg:py-32 bg-card">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Projects</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Forge Alliances</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Explore innovative projects from our community. Find a team or get inspired for your next big idea.
-                </p>
-              </div>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {projects.map((project, index) => (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center gap-4">
-                    <Briefcase className="w-8 h-8 text-primary" />
-                    <CardTitle className="font-headline">{project.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{project.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle>Contests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">Explore ongoing and upcoming contests.</p>
+              <ul className="list-disc list-inside space-y-1 text-left text-gray-700 dark:text-gray-200">
+                {contests.map((contest, index) => (
+                  <li key={index}>{contest.name}</li>
+                ))}
+              </ul>
+              <Link href="/contests">
+                <Button variant="link" className="mt-4 p-0 h-auto">View All Contests</Button>
+              </Link>
+            </CardContent>
+          </Card>
 
-        <section id="users" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Community</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Meet the Knights</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Our vibrant community of developers, designers, and innovators.
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-center flex-wrap gap-4">
-              {users.map((user, index) => (
-                  <Avatar key={index} className="w-16 h-16 border-2 border-primary">
-                  <AvatarImage src={user.avatar} data-ai-hint={user.aiHint}/>
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              ))}
-            </div>
-          </div>
-        </section>
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle>Projects</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">Browse amazing projects from our community.</p>
+              <ul className="list-disc list-inside space-y-1 text-left text-gray-700 dark:text-gray-200">
+                {projects.map((project, index) => (
+                  <li key={index}>{project.name}</li>
+                ))}
+              </ul>
+              <Link href="/projects">
+                <Button variant="link" className="mt-4 p-0 h-auto">View All Projects</Button>
+              </Link>
+            </CardContent>
+          </Card>
 
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle>Users</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">Meet the talented individuals and teams.</p>
+              <ul className="list-disc list-inside space-y-1 text-left text-gray-700 dark:text-gray-200">
+                {users.map((user, index) => (
+                  <li key={index}>{user.name}</li>
+                ))}
+              </ul>
+              <Link href="/users">
+                <Button variant="link" className="mt-4 p-0 h-auto">View All Users</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </section>
+        <CreateProjectDialog
+          isOpen={isCreateProjectDialogOpen}
+          onOpenChange={setIsCreateProjectDialogOpen}
+          onProjectCreated={handleProjectCreated}
+        />
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 OpenKnights. All rights reserved.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Terms of Service
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Privacy
-          </Link>
-        </nav>
-      </footer>
-    </div>
+    </>
   );
-}

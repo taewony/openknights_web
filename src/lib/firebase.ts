@@ -2,19 +2,20 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore'; // Added for Firestore
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyABcwTOUG-42pNsY67jL0bKLH32XAqxJZk",
-  authDomain: "openknights.firebaseapp.com",
-  projectId: "openknights",
-  storageBucket: "openknights.firebasestorage.app",
-  messagingSenderId: "248845874248",
-  appId: "1:248845874248:web:953c0735052d509d1b547d",
-  measurementId: "G-Q386X35S50"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
@@ -27,3 +28,4 @@ if (typeof window !== "undefined") {
 
 export { app, analytics };
 export const auth = getAuth(app);
+export const db = getFirestore(app); // Added for Firestore
