@@ -1,62 +1,57 @@
-There are still styling issues with the navigation menu:
-1) The vertical alignment of the "Login" menu item is different from "Dashboard" and "Projects". 
-   - Make all menu items (Dashboard, Projects, Login) have the same vertical alignment.
-   - Ensure they share the same base CSS/Tailwind classes for alignment.
+다음과 같이 app/page.tsx 내의 3개 card를 보여주는 section을 아래와 같은 내용으로 바꿔줘.
 
-2) The hover effect for the "Login" menu item is different from the other menu items.
-   - Unify the hover styles so all menu items have the same hover behavior (text color change, underline, or background highlight).
-   - Apply consistent padding, margin, and border-radius so the active/hover states look identical across all menu items.
+        {/* 3-Card Grid Section */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>오픈소스 SW활용 경진대회</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-bold text-blue-600 dark:text-blue-400 mb-4">
+                "작은 아이디어라도 좋다. 무조건 만들어 보고 대회 신청 고고~"
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
+                <li>본선 일정: 2025년 12월 4일(목)</li>
+                <li>예선 신청은 별도 공지 예정</li>
+                <li>멘토 교수님과 아이디어를 구체화하고, 미리 작품으로 만들어 보자!</li>
+              </ul>
+              <a href="#contests" className="inline-block mt-4">
+                <Button variant="link">View All Contests</Button>
+              </a>
+            </CardContent>
+          </Card>
 
-Update the React components and Tailwind className values as needed to achieve consistent alignment and hover styling for all menu items.
+          <Card>
+            <CardHeader>
+              <CardTitle>SW창업 아이디어 경진대회</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">Browse amazing projects from our community.</p>
+              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
+                {projects.map((project, index) => (
+                  <li key={index}>{project.name}</li>
+                ))}
+              </ul>
+              <a href="#projects" className="inline-block mt-4">
+                 <Button variant="link">View All Projects</Button>
+              </a>
+            </CardContent>
+          </Card>
 
-
----- 아래는 작업 완성된 prompt이므로 무시한다.
-1. `LoginMenu.tsx` 생성  
-2. `app/page.tsx`에서 LoginMenu 호출 추가  
-3. `main-layout.tsx`에서 중복된 로그인/로그아웃 코드 제거  
-
-Create a new React component called `LoginMenu` in `components/LoginMenu.tsx`.
-This component should:
-1. Use Firebase Auth to check if the user is logged in.
-2. If logged in, show a "Logout" button (calls `signOut` from Firebase).
-3. If not logged in, show a "Login" link (navigates to `/login` page).
-4. Use `useAuthState` from `react-firebase-hooks/auth` if available.
-
-Update:
-- `app/page.tsx`: add `<LoginMenu />` inside the default `Home` page export, replacing any static "Login" menu code.
-- `layouts/main-layout.tsx`: remove any inline login/logout logic and use the new `<LoginMenu />` instead.
-
-Style:
-- Use Tailwind CSS classes to match existing menu button/link styles.
-
-Here is a starter code skeleton for `components/LoginMenu.tsx`:
-
-```tsx
-import React from 'react'
-import Link from 'next/link'
-import { auth } from '../lib/firebase' // adjust path to your firebase config
-import { signOut } from 'firebase/auth'
-import { useAuthState } from 'react-firebase-hooks/auth'
-
-const LoginMenu: React.FC = () => {
-  const [user, loading] = useAuthState(auth)
-
-  if (loading) {
-    return <span className="text-gray-500">Loading...</span>
-  }
-
-  return user ? (
-    <button
-      onClick={() => signOut(auth)}
-      className="px-3 py-1 rounded hover:bg-gray-100"
-    >
-      Logout
-    </button>
-  ) : (
-    <Link href="/login" className="px-3 py-1 rounded hover:bg-gray-100">
-      Login
-    </Link>
-  )
-}
-
-export default LoginMenu
+          <Card>
+            <CardHeader>
+              <CardTitle>SW창의융합 경진대회</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">Meet the talented individuals and teams.</p>
+              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
+                {users.map((user, index) => (
+                  <li key={index}>{user.name}</li>
+                ))}
+              </ul>
+              <a href="#users" className="inline-block mt-4">
+                <Button variant="link">View All Users</Button>
+              </a>
+            </CardContent>
+          </Card>
+        </section>

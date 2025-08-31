@@ -1,6 +1,5 @@
 'use client';
 
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,15 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Briefcase, Trophy, Users, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 
-
-
 import { useState } from 'react'; // Added useState
 import { useAuth } from '@/contexts/AuthContext';
 import CreateProjectDialog from '@/components/CreateProjectDialog';
-
-
-
-
 import { useToast } from '@/hooks/use-toast'; // For toast notifications
 
 export default function Home() {
@@ -75,55 +68,62 @@ export default function Home() {
           </Button>
         </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-          <Card className="shadow-md">
+        {/* 3-Card Grid Section */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card>
             <CardHeader>
-              <CardTitle>Contests</CardTitle>
+              <CardTitle>오픈소스 SW활용 경진대회</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">Explore ongoing and upcoming contests.</p>
-              <ul className="list-disc list-inside space-y-1 text-left text-gray-700 dark:text-gray-200">
-                {contests.map((contest, index) => (
-                  <li key={index}>{contest.name}</li>
-                ))}
+              <p className="font-bold text-blue-600 dark:text-blue-400 mb-4">
+                "작은 아이디어라도 좋다. 무조건 만들어 보고 대회 신청 고고~"
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
+                <li>본선 일정: 2025년 12월 4일(목)</li>
+                <li>예선 신청은 별도 공지 예정</li>
+                <li>멘토 교수님과 아이디어를 구체화하고, 미리 작품으로 만들어 보자!</li>
               </ul>
-              <Link href="/contests">
-                <Button variant="link" className="mt-4 p-0 h-auto">View All Contests</Button>
-              </Link>
+              <a href="#contests" className="inline-block mt-4">
+                <Button variant="link">View All Projects in 오픈소스</Button>
+              </a>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md">
+          <Card>
             <CardHeader>
-              <CardTitle>Projects</CardTitle>
+              <CardTitle>SW창업 아이디어 경진대회</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">Browse amazing projects from our community.</p>
-              <ul className="list-disc list-inside space-y-1 text-left text-gray-700 dark:text-gray-200">
-                {projects.map((project, index) => (
-                  <li key={index}>{project.name}</li>
-                ))}
+              <p className="font-bold text-blue-600 dark:text-blue-400 mb-4">
+                "지금은 AI 시대, 누구나 나만의 아이디어로 창업 준비를 시작할 수 있다."
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
+                <li>본선 일정: 2025년 12월 11일(목)</li>
+                <li>예선 신청은 별도 공지 예정</li>
+                <li>멘토 교수님과 창업 아이디어를 협의하고, 꾸준히 준비해 나가자!</li>
               </ul>
-              <Link href="/projects">
-                <Button variant="link" className="mt-4 p-0 h-auto">View All Projects</Button>
-              </Link>
+              <a href="#projects" className="inline-block mt-4">
+                 <Button variant="link">View All Projects in SW창업</Button>
+              </a>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md">
+          <Card>
             <CardHeader>
-              <CardTitle>Users</CardTitle>
+              <CardTitle>SW창의융합 경진대회</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">Meet the talented individuals and teams.</p>
-              <ul className="list-disc list-inside space-y-1 text-left text-gray-700 dark:text-gray-200">
-                {users.map((user, index) => (
-                  <li key={index}>{user.name}</li>
-                ))}
+              <p className="font-bold text-blue-600 dark:text-blue-400 mb-4">
+                "작은 아이디어라도 좋다. 무조건 만들어 보고 대회 신청 고고~"
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
+                <li>본선 일정: 2025년 12월 5일(금)</li>
+                <li>예선 신청은 별도 공지 예정</li>
+                <li>멘토 교수님과 아이디어를 구체화하고, 미리 작품으로 만들어 보자!</li>
               </ul>
-              <Link href="/users">
-                <Button variant="link" className="mt-4 p-0 h-auto">View All Users</Button>
-              </Link>
+              <a href="#users" className="inline-block mt-4">
+                <Button variant="link">View All Projects in 창의융합</Button>
+              </a>
             </CardContent>
           </Card>
         </section>
