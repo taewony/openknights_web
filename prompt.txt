@@ -1,57 +1,69 @@
-다음과 같이 app/page.tsx 내의 3개 card를 보여주는 section을 아래와 같은 내용으로 바꿔줘.
+## 작업 개요
+현재 오픈소스 경진대회 data 만 관리하도록 개발 되었는데,
+아래 3개 경진대회를 관리할 수 있도록 기능을 확장 하려고 해.
 
-        {/* 3-Card Grid Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>오픈소스 SW활용 경진대회</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="font-bold text-blue-600 dark:text-blue-400 mb-4">
-                "작은 아이디어라도 좋다. 무조건 만들어 보고 대회 신청 고고~"
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
-                <li>본선 일정: 2025년 12월 4일(목)</li>
-                <li>예선 신청은 별도 공지 예정</li>
-                <li>멘토 교수님과 아이디어를 구체화하고, 미리 작품으로 만들어 보자!</li>
-              </ul>
-              <a href="#contests" className="inline-block mt-4">
-                <Button variant="link">View All Contests</Button>
-              </a>
-            </CardContent>
-          </Card>
+1) 오픈소스 경진대회 (/opensource)
+대회기간 : 2025.11.17~12.05
+예선 작품 제출 : 2025.10.27 ~ 12.04
+예선 작품 심사 : 2025.11.24(월)
+본선 : 2025.12.04(목) 14:00~17:00
 
-          <Card>
-            <CardHeader>
-              <CardTitle>SW창업 아이디어 경진대회</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">Browse amazing projects from our community.</p>
-              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
-                {projects.map((project, index) => (
-                  <li key={index}>{project.name}</li>
-                ))}
-              </ul>
-              <a href="#projects" className="inline-block mt-4">
-                 <Button variant="link">View All Projects</Button>
-              </a>
-            </CardContent>
-          </Card>
+2) 창업아이디어 경진대회 (startup)
+대회기간 : 2025.11.03~11.28
+예선 작품 제출 : 2025.11.03~11.21
+예선 작품 심사 : 2025.11.24(월)
+본선 : 2025.11.28(금) 14:00~17:00
 
-          <Card>
-            <CardHeader>
-              <CardTitle>SW창의융합 경진대회</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">Meet the talented individuals and teams.</p>
-              <ul className="list-disc list-inside space-y-2 text-left text-gray-700 dark:text-gray-200">
-                {users.map((user, index) => (
-                  <li key={index}>{user.name}</li>
-                ))}
-              </ul>
-              <a href="#users" className="inline-block mt-4">
-                <Button variant="link">View All Users</Button>
-              </a>
-            </CardContent>
-          </Card>
-        </section>
+3) SW창의융합 경진대회 (swcreate)
+대회기간 : 2025.11.17~12.05
+예선 작품 제출 : 2025.11.17~11.26
+예선 작품 심사 : 2025.11.27(목)
+본선 : 2025.12.05(금) 14:00~17:00
+
+
+## DB tasklist 
+- 'ADMIN' role을 가진 user가 로그인하면 우측 상단에 'DB migration' 버튼을 보여준다.
+- users : 변경 사항 없음. 참여하고 있는 project는 name 으로 lookup
+
+- contests : 현재 term 만으로 구분하고 있는데, term 필드외에 typedTerm 필드 추가.
+  - typedTerm은 'swopen-2025-1st', 'swcreate-2025-2nd'와 같이 어떤 경진대회인지도 포함한 string으로 저장한다.
+
+- projects : project가 속한 contest를 찾기 위해 typedTerm 필드도 추가하여 저장한다.
+
+## UI tasklist
+- dropdown menu로 변경하여, typedTerm 선택하면 현재 선택된 특정 경진대회가 표시되게 한다.
+  이 상태에서 project를 누르면 해당 경진대회에 신청된 project만 보여 준다.
+
+## 추가 기능
+1) CSV 파일 처리
+  - 일정
+  - 성적 (score)
+  - project detail data
+
+2) 경진대회 대시보드
+  - 대표 공지사항 표시 (DB에서 일정 읽어 표시, ## 제목, ### 제목)
+  - 전체 일정 표시 (DB에서 일정 읽어 표시)
+  - 예선 상황 (DB에서 읽어 상태 표시)
+  - 본선 상황
+  - 입상 상황
+
+3) 공지글 등록 기능
+  - ADMIN role 로그인 시 기능 허용
+
+## 추후 기능
+  - Likes
+  - project 이름으로 매칭되는 목록 검색
+  - tag(태그)로 project 매칭되는 목록 검색
+  - 멘토 요청 > 신청자 목록 (요청 문구, 관련 project 이름)
+  - 멘토 등록 > 신청자 Accept ... > 기술적 답변, 기타 조언 등
+
+   1. DB 마이그레이션: 'ADMIN' 역할의 사용자가 'DB migration' 버튼을 클릭하면 정확히 어떤 작업이 수행되어야
+      하나요? 기존 contests 및 projects 데이터에 typedTerm 필드를 자동으로 추가하고 값을 채우는 스크립트를
+      실행해야 합니까?
+   2. `contests` 데이터: contests 컬렉션에 typedTerm 필드를 추가할 때, 기존의 term 필드는 그대로 유지해야
+      하나요, 아니면 typedTerm으로 대체해야 하나요?
+   3. CSV 파일 처리: 'CSV 파일 처리' 기능에 대해 더 자세한 설명이 필요합니다.
+   4. 경진대회 대시보드 및 공지:
+   5. 사용자(users) 정보: users 컬렉션 관련하여 "참여하고 있는 project는 name 으로 lookup"이라고 하셨는데,
+      사용자의 프로필 페이지 같은 곳에서 해당 사용자가 참여한 모든 경진대회의 모든 프로젝트 목록을 보여주어야
+      한다는 의미인가요?

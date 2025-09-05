@@ -83,9 +83,9 @@ export default function Home() {
                 <li>예선 신청은 별도 공지 예정</li>
                 <li>멘토 교수님과 아이디어를 구체화하고, 미리 작품으로 만들어 보자!</li>
               </ul>
-              <a href="#contests" className="inline-block mt-4">
-                <Button variant="link">View All Projects in 오픈소스</Button>
-              </a>
+              <Link href="/opensource" className="inline-block mt-4">
+                <Button variant="link">View Details in 오픈소스SW</Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -102,9 +102,9 @@ export default function Home() {
                 <li>예선 신청은 별도 공지 예정</li>
                 <li>멘토 교수님과 창업 아이디어를 협의하고, 꾸준히 준비해 나가자!</li>
               </ul>
-              <a href="#projects" className="inline-block mt-4">
-                 <Button variant="link">View All Projects in SW창업</Button>
-              </a>
+              <Link href="/startup" className="inline-block mt-4">
+                 <Button variant="link">View Details in SW창업아이디어</Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -121,9 +121,9 @@ export default function Home() {
                 <li>예선 신청은 별도 공지 예정</li>
                 <li>멘토 교수님과 아이디어를 구체화하고, 미리 작품으로 만들어 보자!</li>
               </ul>
-              <a href="#users" className="inline-block mt-4">
-                <Button variant="link">View All Projects in 창의융합</Button>
-              </a>
+              <Link href="/swcreate" className="inline-block mt-4">
+                <Button variant="link">View Details  in SW창의융합</Button>
+              </Link>
             </CardContent>
           </Card>
         </section>
